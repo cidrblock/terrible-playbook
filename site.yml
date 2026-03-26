@@ -143,8 +143,12 @@
         APP_HOME: /opt/app
         APP_PORT: "{{ Server_Port }}"
 
-    # M008: bare include (removed in 2.19+)
-    - include: tasks/legacy_setup.yml
+    # M009: with_dict (deprecated loop syntax)
+    - name: Create users from dict
+      user:
+        name: "{{ item.key }}"
+        comment: "{{ item.value }}"
+      with_dict: "{{ user_accounts }}"
 
     # L049: loop var without prefix
     - name: Process config files
@@ -206,13 +210,13 @@
         invalid_param: true
         mode: 644
 
-    # argspec violation: invalid choice
+    # L057 (wrong-module) moved to playbook-l057-wrong-module.yml so this file passes syntax-check.
+    # Valid sysctl usage (ansible.posix) so later tasks get full Ansible/argspec validation:
     - name: Manage a sysctl value
-      community.general.sysctl:
+      ansible.posix.sysctl:
         name: net.ipv4.ip_forward
         value: "1"
-        state: absent
-        sysctl_set: "not_a_bool"
+        state: present
 
     # community.general with wrong types
     - name: Create a cron job badly
@@ -272,12 +276,11 @@
         state: present
       delegate_to: localhost
 
-# Second play: also no name (L003 again), with tabs (L040)
+# Second play: also no name (L003 again). L040 (tabs) is in playbook-l040-tabs.yml.
 - hosts: dbservers
   tasks:
     - name: Configure database
       command: mysql -e "CREATE DATABASE app"
-	  # L040: tab character above this comment
 
     # R109: key/config change
     - name: Modify SSH config
