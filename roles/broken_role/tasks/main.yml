@@ -3,6 +3,6 @@
 
 - command: echo "I am a broken role task"
 
-- name: do something risky in the role
+- name: Do something risky in the role
   shell: rm -rf /tmp/old_data/*
   become: true
